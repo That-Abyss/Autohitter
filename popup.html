@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+        <title>Card AutoHitter</title>
+        <style>
+        /* Keep existing styles, you might want to adjust textarea height */
+        body {
+            font-family: sans-serif;
+            width: 350px;
+            padding: 15px;
+            font-size: 14px;
+        }
+
+        textarea {
+            width: 95%;
+            padding: 8px;
+            margin-top: 4px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            min-height: 80px;
+            /* Adjusted height */
+            resize: vertical;
+            /* Allow vertical resizing */
+        }
+
+        /* Style for standard text and number inputs */
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            /* Default width for single line inputs */
+            padding: 8px;
+            margin-top: 4px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* Specific widths for the smaller inputs in the grid */
+        .bin-input-grid input[type="text"],
+        .bin-input-grid input[type="number"] {
+            width: 100%;
+            /* Reset to 100% within their grid cell */
+        }
+
+
+        button {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+            border: none;
+            margin-right: 5px;
+            margin-top: 10px;
+        }
+
+        #processCardsBtn {
+            /* Apply style to both process buttons */
+            background-color: #28a745;
+            color: white;
+            width: 100%;
+        }
+
+        /* New styles for the BIN generation section */
+        .bin-generation-section h3 {
+            margin-bottom: 10px;
+        }
+
+        .bin-input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            /* Two columns */
+            gap: 10px;
+            /* Gap between grid items */
+            margin-top: 10px;
+        }
+
+        .grid-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .grid-item label {
+            margin-bottom: 5px;
+        }
+
+        #generateAndAddBtn {
+            /* Style for the new BIN generate button */
+            background-color: #007bff;
+            color: white;
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1em;
+            margin-top: 15px;
+        }
+
+
+        /* Style for the Start Cycle button */
+        #startCycleBtn {
+            background-color: #e50914;
+            color: white;
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1em;
+            margin-top: 15px;
+        }
+
+        hr {
+            margin: 20px 0;
+            border: 0;
+            border-top: 1px solid #eee;
+        }
+
+        .saved-cards-list {
+            max-height: 150px;
+            overflow-y: auto;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            padding: 5px;
+        }
+
+        .card-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 3px;
+            font-size: 0.9em;
+        }
+
+        .card-item:last-child {
+            border-bottom: none;
+        }
+
+        .card-info {
+            font-weight: bold;
+        }
+
+        .card-info span {
+            font-weight: normal;
+            color: #555;
+            font-size: 0.9em;
+            margin-left: 5px;
+        }
+
+        .card-actions button {
+            padding: 3px 6px;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+
+        .delete-card-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .delete-all-btn {
+            /* Style for the delete all button */
+            background-color: #f0ad4e;
+            color: white;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+
+        .status {
+            margin-top: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        #statusMessage {
+            color: #007bff;
+        }
+
+        .warning {
+            color: #dc3545;
+            font-weight: bold;
+            font-size: 0.95em;
+            margin-top: 15px;
+            border: 2px solid #dc3545;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #f8d7da;
+        }
+    </style>
+</head>
+
+<body>
+        <h3>Add Cards (Format: CARD_NO|MM|YYYY|CVV)</h3>
+        <label for="bulkCardInput">Enter cards (one per line):</label>
+        <textarea id="bulkCardInput"
+        placeholder="1111222233334444|01|2028|123
+5555666677778888|12|2029|456"></textarea>
+        <button id="processCardsBtn">Process & Save Cards</button>
+
+
+
+    <hr>
+
+        <div class="bin-generation-section">
+        <h3>Generate Cards from BIN</h3>
+
+        <div class="grid-item">
+            <label for="binInput">Enter BIN:</label>
+            <input type="text" id="binInput" placeholder="123456">
+        </div>
+
+        <div class="bin-input-grid">
+            <div class="grid-item">
+                <label for="countInput">Count:</label>
+                <input type="number" id="countInput" value="10" min="1" max="100">
+            </div>
+            <div class="grid-item">
+                <label for="mmInput">MM (0=random):</label>
+                <input type="text" id="mmInput" placeholder="0 or 01-12" value="0">
+            </div>
+            <div class="grid-item">
+                <label for="yyyyInput">YYYY (0=random):</label>
+                <input type="text" id="yyyyInput" placeholder="0 or 2028" value="0">
+            </div>
+            <div class="grid-item">
+                <label for="cvvInput">CVV (0=random):</label>
+                <input type="text" id="cvvInput" placeholder="0 or 123" value="0">
+            </div>
+        </div>
+
+        <button id="generateAndAddBtn">Generate & Add to Saved Cards</button>
+    </div>
+
+
+    <hr>
+
+        <h3>Saved Cards</h3>
+        <div id="savedCardsList" class="saved-cards-list">
+            <p id="noCardsMsg" style="display: none; color: #555;">No cards saved yet.</p>
+            </div>
+
+    <hr>
+
+        <button id="startCycleBtn">Start AutoHitter(RISKY!)</button>
+        <div class="status"><span id="statusMessage"></span></div>
+
+        <p class="warning"><strong>DANGER:</strong> Auto-Hitting is illeagal and risky, may violate ToS, Made in INDIA, By Mga Place.Sale</p>
+
+    <script src="cardbin.js"></script>
+    <script src="popup.js"></script>
+</body>
+
+</html>
